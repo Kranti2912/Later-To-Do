@@ -90,6 +90,62 @@ function peekWindowSizeFor(edge) {
   return { width: PEEK_W + PEEK_SHADOW_PAD * 2, height: PEEK_H + PEEK_SHADOW_PAD };
 }
 
+function peekButtonShapeFor(edge) {
+  const { width, height } = peekWindowSizeFor(edge);
+  let buttonX = PEEK_SHADOW_PAD;
+  let buttonY = PEEK_SHADOW_PAD;
+  const rounded = { topLeft: false, topRight: false, bottomRight: false, bottomLeft: false };
+
+  if (edge === 'right') {
+    buttonX = PEEK_SHADOW_PAD;
+    rounded.topLeft = true;
+    rounded.bottomLeft = true;
+  } else if (edge === 'left') {
+    buttonX = 0;
+    rounded.topRight = true;
+    rounded.bottomRight = true;
+  } else if (edge === 'top') {
+    buttonY = 0;
+    rounded.bottomLeft = true;
+    rounded.bottomRight = true;
+  } else {
+    rounded.topLeft = true;
+    rounded.topRight = true;
+  }
+
+  const radius = Math.min(PEEK_H / 2, PEEK_W / 2);
+  const rects = [];
+  for (let row = buttonY; row < buttonY + PEEK_H; row += 1) {
+    const centerY = row + 0.5;
+    let leftInset = 0;
+    let rightInset = 0;
+
+    if (rounded.topLeft && centerY < buttonY + radius) {
+      const dy = buttonY + radius - centerY;
+      leftInset = Math.round(radius - Math.sqrt(Math.max(0, radius * radius - dy * dy)));
+    } else if (rounded.bottomLeft && centerY > buttonY + PEEK_H - radius) {
+      const dy = centerY - (buttonY + PEEK_H - radius);
+      leftInset = Math.round(radius - Math.sqrt(Math.max(0, radius * radius - dy * dy)));
+    }
+
+    if (rounded.topRight && centerY < buttonY + radius) {
+      const dy = buttonY + radius - centerY;
+      rightInset = Math.round(radius - Math.sqrt(Math.max(0, radius * radius - dy * dy)));
+    } else if (rounded.bottomRight && centerY > buttonY + PEEK_H - radius) {
+      const dy = centerY - (buttonY + PEEK_H - radius);
+      rightInset = Math.round(radius - Math.sqrt(Math.max(0, radius * radius - dy * dy)));
+    }
+
+    rects.push({
+      x: buttonX + leftInset,
+      y: row,
+      width: Math.max(1, PEEK_W - leftInset - rightInset),
+      height: 1
+    });
+  }
+  return rects;
+}
+
 function expandedSizeFor(area) {
   const maxWidth = Math.max(MIN_EXPANDED_W, area.width - 24);
   const maxHeight = Math.max(MIN_EXPANDED_H, area.height - 24);
@@ -145,9 +201,15 @@ function setMode(mode, edge = state.edge, offset = state.offset, persist = true)
   win.setResizable(mode === 'expanded');
   win.setAlwaysOnTop(true, 'floating');
   if (process.platform === 'win32' && typeof win.setBackgroundMaterial === 'function') {
-    // Acrylic is a whole-window material. Keep it on the full panel, but turn
-    // it off in peek mode so the transparent margins don't become a gray box.
-    try { win.setBackgroundMaterial(mode === 'expanded' ? 'acrylic' : 'none'); } catch (_) {}
+    // Acrylic supplies the real desktop blur. Clip the peek window to the
+    // button's rounded silhouette so its transparent margins don't become a box.
+    try { win.setBackgroundMaterial('acrylic'); } catch (_) {}
+  }
+  if (process.platform === 'win32' && typeof win.setShape === 'function') {
+    try { win.setShape(mode === 'peek' ? peekButtonShapeFor(state.edge) : []); } catch (_) {}
+  }
+  if (typeof win.setHasShadow === 'function') {
+    try { win.setHasShadow(mode === 'peek'); } catch (_) {}
   }
   if (mode === 'peek') {
     try { win.setBackgroundColor('#00000000'); } catch (_) {}

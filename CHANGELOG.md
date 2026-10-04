@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.16
+
+- Bundled Montserrat for task text so the list uses the same typeface on every supported PC.
+- Added a Windows Acrylic treatment for the peek pill and expanded panel. On some Windows setups, the native backdrop extended beyond the pill; 1.0.17 removes that compact-window backdrop.
+
 ## 1.0.15
 
 - Let the peek button move freely while dragging, then dock it to the nearest screen edge when released.

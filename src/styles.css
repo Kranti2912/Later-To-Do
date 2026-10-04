@@ -2,6 +2,13 @@
   font-family: 'Space Mono Local';
   src: local('Space Mono');
 }
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/Montserrat-Variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
 
 :root {
   --bg: #262626;
@@ -45,6 +52,8 @@ button { border: 0; background: transparent; cursor: pointer; }
   box-shadow: 0 5px 16px rgba(0,0,0,.36), 0 1px 4px rgba(0,0,0,.26);
   font-size: 18px; line-height: 1;
   transition: filter .14s ease, box-shadow .14s ease;
+  -webkit-backdrop-filter: blur(14px) saturate(135%);
+  backdrop-filter: blur(14px) saturate(135%);
   -webkit-app-region: no-drag;
 }
 .peek-btn:hover {
@@ -89,7 +98,7 @@ button { border: 0; background: transparent; cursor: pointer; }
 .check { width: 22px; height: 22px; border: 1px solid var(--fg); border-radius: 6px; font-size: 15px; line-height: 20px; }
 .task.done .check { background: var(--fg); color: var(--bg); }
 .task.done .task-text { text-decoration: line-through; opacity: .45; }
-.task-text { font-size: 14px; line-height: 1.35; overflow-wrap: anywhere; }
+.task-text { font-family: 'Montserrat', sans-serif; font-size: 14px; line-height: 1.35; letter-spacing: -0.02em; overflow-wrap: anywhere; }
 .delete { width: 24px; height: 24px; color: var(--muted); border-radius: 7px; font-size: 18px; opacity: 0; }
 .task:hover .delete { opacity: 1; }
 .delete:hover { background: var(--hover); color: var(--fg); }
