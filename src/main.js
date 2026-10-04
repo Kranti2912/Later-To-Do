@@ -142,6 +142,9 @@ function setMode(mode, edge = state.edge, offset = state.offset, persist = true)
   win.setBounds(b, false);
   win.setResizable(mode === 'expanded');
   win.setAlwaysOnTop(true, 'floating');
+  if (process.platform === 'win32' && typeof win.setBackgroundMaterial === 'function') {
+    try { win.setBackgroundMaterial('acrylic'); } catch (_) {}
+  }
   win.webContents.send('mode-changed', { mode, edge: state.edge, theme: state.theme });
 
   if (mode === 'expanded') {

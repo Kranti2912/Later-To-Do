@@ -7,6 +7,7 @@
   --bg: #262626;
   --fg: #e5e5e5;
   --muted: #969696;
+  --glass-bg: rgba(38,38,38,.5);
   --line: rgba(229,229,229,.14);
   --hover: rgba(229,229,229,.08);
 }
@@ -14,6 +15,7 @@
   --bg: #f4f4f4;
   --fg: #262626;
   --muted: #686868;
+  --glass-bg: rgba(244,244,244,.5);
   --line: rgba(38,38,38,.16);
   --hover: rgba(38,38,38,.08);
 }
@@ -37,11 +39,13 @@ button { border: 0; background: transparent; cursor: pointer; }
 :root[data-edge="bottom"] .peek { align-items: flex-end; }
 .peek-btn {
   width: 44px; height: 34px; padding: 0;
-  background: var(--bg); color: var(--fg);
+  background: var(--glass-bg); color: var(--fg);
   border: 1px solid var(--line);
   border-radius: 18px;
   box-shadow: 0 5px 16px rgba(0,0,0,.36), 0 1px 4px rgba(0,0,0,.26);
   font-size: 18px; line-height: 1;
+  -webkit-backdrop-filter: blur(14px) saturate(135%);
+  backdrop-filter: blur(14px) saturate(135%);
   -webkit-app-region: no-drag;
 }
 .peek-btn:hover { background: var(--hover); }
@@ -52,7 +56,9 @@ button { border: 0; background: transparent; cursor: pointer; }
 
 .panel {
   flex-direction: column;
-  background: var(--bg);
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+  backdrop-filter: blur(18px) saturate(135%);
   border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
