@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld('laterAPI', {
   setTheme: (theme) => ipcRenderer.send('theme', theme),
   setEdgeOffset: (payload) => ipcRenderer.send('set-edge-offset', payload),
   movePeek: (payload) => ipcRenderer.send('move-peek', payload),
+  finishPeekMove: () => ipcRenderer.send('finish-peek-move'),
+  setContentHeight: (height) => ipcRenderer.send('content-height', height),
   onModeChanged: (fn) => ipcRenderer.on('mode-changed', (_, data) => fn(data)),
   onInitialState: (fn) => ipcRenderer.once('initial-state', (_, data) => fn(data))
 });

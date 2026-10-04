@@ -14,6 +14,7 @@ let peekDragging = false;
 let dragPointerId = null;
 let dragStartPointer = null;
 let dragStartWindow = null;
+let resizeFrame = null;
 
 function loadTasks() {
   try {
@@ -23,6 +24,20 @@ function loadTasks() {
   catch (_) { return []; }
 }
 function saveTasks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); }
+function requestContentResize() {
+  if (!panel.classList.contains('active')) return;
+  if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
+  resizeFrame = requestAnimationFrame(() => {
+    resizeFrame = null;
+    const tasksStyle = getComputedStyle(tasksEl);
+    const taskPadding = parseFloat(tasksStyle.paddingTop) + parseFloat(tasksStyle.paddingBottom);
+    const taskContentHeight = Array.from(tasksEl.children)
+      .reduce((total, child) => total + child.getBoundingClientRect().height, 0);
+    const chromeHeight = $('topbar').offsetHeight + $('composer').offsetHeight + $('panelFooter').offsetHeight;
+    const panelBorders = 2;
+    window.laterAPI.setContentHeight(Math.ceil(chromeHeight + taskPadding + taskContentHeight + panelBorders));
+  });
+}
 function applyTheme() {
   document.documentElement.dataset.theme = theme;
   localStorage.setItem(THEME_KEY, theme);
@@ -36,6 +51,7 @@ function render() {
     empty.className = 'empty';
     empty.textContent = 'Nothing here yet. Add a task.';
     tasksEl.appendChild(empty);
+    requestContentResize();
     return;
   }
 
@@ -68,6 +84,7 @@ function render() {
     row.append(check, text, del);
     tasksEl.appendChild(row);
   });
+  requestContentResize();
 }
 
 function addTask() {
@@ -91,22 +108,31 @@ $('peekBtn').addEventListener('pointerdown', (e) => {
 });
 $('peekBtn').addEventListener('pointermove', (e) => {
   if (dragPointerId !== e.pointerId) return;
-  if (Math.abs(e.movementX) + Math.abs(e.movementY) > 2) peekDragging = true;
+  const movedX = e.screenX - dragStartPointer.x;
+  const movedY = e.screenY - dragStartPointer.y;
+  if (Math.abs(movedX) + Math.abs(movedY) > 6) peekDragging = true;
   if (!peekDragging) return;
-  const x = dragStartWindow.x + e.screenX - dragStartPointer.x;
-  const y = dragStartWindow.y + e.screenY - dragStartPointer.y;
+  const x = dragStartWindow.x + movedX;
+  const y = dragStartWindow.y + movedY;
   window.laterAPI.movePeek({ x, y });
 });
-$('peekBtn').addEventListener('pointerup', (e) => {
+function endPeekPointer(e) {
   if (dragPointerId === e.pointerId) {
     try { $('peekBtn').releasePointerCapture(e.pointerId); } catch (_) {}
+    if (peekDragging) window.laterAPI.finishPeekMove();
     dragPointerId = null;
     dragStartPointer = null;
     dragStartWindow = null;
     setTimeout(() => { peekDragging = false; }, 0);
   }
-});
+}
+$('peekBtn').addEventListener('pointerup', endPeekPointer);
+$('peekBtn').addEventListener('pointercancel', endPeekPointer);
 $('minusBtn').addEventListener('click', () => window.laterAPI.peek());
+$('quitBtn').addEventListener('click', () => {
+  saveTasks();
+  window.laterAPI.quit();
+});
 $('addBtn').addEventListener('click', addTask);
 $('themeBtn').addEventListener('click', () => {
   theme = theme === 'dark' ? 'light' : 'dark';
@@ -123,6 +149,7 @@ window.laterAPI.onInitialState((state) => {
     peek.classList.add('active'); panel.classList.remove('active');
   } else {
     peek.classList.remove('active'); panel.classList.add('active');
+    requestContentResize();
   }
 });
 
@@ -133,6 +160,7 @@ window.laterAPI.onModeChanged((state) => {
     peek.classList.add('active'); panel.classList.remove('active');
   } else {
     peek.classList.remove('active'); panel.classList.add('active');
+    requestContentResize();
   }
 });
 

@@ -1,32 +1,35 @@
 # Later
 
-Later is a floating Windows to-do list. Its edge-docked peek button opens a compact task panel when needed.
+**Later** is a lightweight floating to-do list for Windows. Keep a small peek button at the edge of your screen, then open the full task panel when you need it.
 
-## Install
+## Install or update
 
-Download `Later-Setup-1.0.3.exe` from the [GitHub Releases](https://github.com/Kranti2912/Later-To-Do/releases/latest) and double-click it. The installer creates desktop and Start menu shortcuts and launches Later. No Node.js or developer setup is needed to use the installer.
+For normal use, download the latest **Later-Setup** installer from [GitHub Releases](https://github.com/Kranti2912/Later-To-Do/releases/latest) and double-click it. The one-click installer updates an existing copy, keeps saved tasks and the selected theme, creates Start menu and desktop shortcuts, and opens Later when installation finishes. No separate runtime or setup steps are needed.
 
-Later is built for Windows x64. Releases are unsigned; download installers from this repository's Releases page.
+Later is built for Windows x64. Installers are unsigned; download them from this repository's Releases page.
 
 ## Features
 
-- Add, complete, and remove tasks
-- Keep the task panel available as a floating window
-- Switch between dark and light themes
-- Save tasks and preferences locally between launches
-- Move the compact peek button along a screen edge
+- Floating peek button that docks to and moves along a screen edge
+- Expanded task panel with adjustable size and content-aware height
+- Add, complete, and delete tasks
+- Dark and light themes, with a higher-contrast translucent light theme
+- Task list, theme, edge, and panel size saved between launches
+- Start-at-login behavior and a system tray menu
+- Keyboard shortcut: **Ctrl + Shift + Space** to bring Later into view
+- Screenshot-friendly visibility recovery for the Windows snipping overlay
 
-## Controls
+## Use Later
 
-- **Ctrl + Shift + Space** — bring Later into view
-- Click the eye button — open the task panel
-- Click **−** — return to peek mode
-- Drag the peek button along the screen edge — reposition it
-- Drag the expanded title bar — move the panel; release it at a screen edge to dock it
+- Click the eye button to open the task panel.
+- Click **−** to return to peek mode.
+- Drag the peek button along an edge to reposition it.
+- Drag the expanded title bar to move the panel, or drag its edges to resize it.
+- Click **Quit** to exit Later. Your tasks remain saved for the next launch.
 
-## Privacy
+## Your data and privacy
 
-Tasks and preferences are stored locally for the current Windows account. Later does not upload or sync the task list.
+Tasks and preferences are stored locally in Later's per-user Windows application data. Later does not upload or sync your task list. User data, installer binaries, build output, and dependency caches are excluded from the source repository. Uninstalling Later does not delete its local task data.
 
 ## Build from source
 
@@ -38,7 +41,18 @@ npm start
 npm run dist
 ```
 
-The Windows installer is created in `dist/`. Do not commit generated installers, build output, or local task data.
+The Windows installer is written to `dist/`. Pushing a version tag builds an installer and attaches it to a GitHub Release.
+
+## Project layout
+
+```text
+src/                    Electron main process and UI
+src/assets/             App assets
+.github/workflows/      Windows build and release automation
+installer.nsh           Installer upgrade behavior
+```
+
+See [CHANGELOG.md](CHANGELOG.md) for release notes. Available source snapshots are identified by Git tags, including `v1.0.3` and `v1.0.14`.
 
 ## License
 
