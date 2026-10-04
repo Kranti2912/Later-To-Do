@@ -1,6 +1,6 @@
 {
   "name": "later-floating-todo",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Later™ — a floating to-do list that lives at the edge of your screen.",
   "main": "src/main.js",
   "author": "Later™",
@@ -28,6 +28,7 @@
       "signAndEditExecutable": false
     },
     "nsis": {
+      "include": "installer.nsh",
       "oneClick": true,
       "perMachine": false,
       "allowElevation": false,

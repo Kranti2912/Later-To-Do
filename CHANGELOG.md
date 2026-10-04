@@ -1,7 +1,5 @@
 # Changelog
 
-## 1.0.3
+## 1.0.5
 
-- Published source for the floating Windows task panel.
-- Added local task persistence, dark and light themes, and an edge-docked peek button.
-- Added Windows installer and desktop/Start menu shortcuts.
+Archived the application source recovered from the original 1.0.5 installer. This tag uses the shared project build and release workflow to make the snapshot rebuildable. Original feature notes were not available, so none are inferred here.
