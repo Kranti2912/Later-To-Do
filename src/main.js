@@ -1,4 +1,4 @@
-const { app, BrowserWindow, globalShortcut, Tray, Menu, screen, ipcMain, nativeImage, dialog } = require('electron');
+const { app, BrowserWindow, globalShortcut, Tray, Menu, ipcMain, nativeImage, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -12,6 +12,7 @@ const STATE_FILE = path.join(app.getPath('userData'), 'later-state.json');
 
 let win = null;
 let tray = null;
+let screen = null;
 let isQuitting = false;
 let windowReady = false;
 let automaticExpandedHeight = INITIAL_EXPANDED_H;
@@ -250,6 +251,11 @@ function createWindow() {
 
 app.whenReady().then(() => {
   if (!hasSingleInstanceLock) return;
+  // Electron only exposes the screen module after the app is ready.
+  screen = require('electron').screen;
+  screen.on('display-added', reanchorVisibleWindow);
+  screen.on('display-removed', reanchorVisibleWindow);
+  screen.on('display-metrics-changed', reanchorVisibleWindow);
   loadState();
   if (app.isPackaged) {
     app.setLoginItemSettings({ openAtLogin: true, path: process.execPath });
@@ -329,7 +335,3 @@ app.on('session-end', () => { isQuitting = true; saveState(); });
 app.on('will-quit', () => globalShortcut.unregisterAll());
 app.on('window-all-closed', (event) => event.preventDefault());
 app.on('activate', showWindow);
-
-screen.on('display-added', reanchorVisibleWindow);
-screen.on('display-removed', reanchorVisibleWindow);
-screen.on('display-metrics-changed', reanchorVisibleWindow);
