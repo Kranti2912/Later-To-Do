@@ -1,0 +1,83 @@
+name: Publish tagged releases
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-2022
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        tag:
+          - v1.0.3
+          - v1.0.5
+          - v1.0.6
+          - v1.0.7
+          - v1.0.8
+          - v1.0.9
+          - v1.0.10
+          - v1.0.11
+          - v1.0.12
+          - v1.0.13
+          - v1.0.14
+          - v1.0.15
+          - v1.0.16
+          - v1.0.17
+    steps:
+      - name: Check out release descriptions
+        uses: actions/checkout@v4
+
+      - name: Check out tagged source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.tag }}
+          path: source
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Check tag matches package version
+        shell: pwsh
+        run: |
+          $tagVersion = "${{ matrix.tag }}".TrimStart('v')
+          $packageVersion = node -p "require('./package.json').version"
+          if ($tagVersion -ne $packageVersion) {
+            throw "Tag v$packageVersion is required for package version $packageVersion; got ${{ matrix.tag }}."
+          }
+        working-directory: source
+
+      - name: Install locked dependencies
+        run: npm ci
+        working-directory: source
+
+      - name: Build Windows installer
+        run: npm run dist
+        working-directory: source
+
+      - name: Create or update GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ matrix.tag }}"
+          $installer = Get-ChildItem -LiteralPath "source/dist" -Filter "Later-Setup-*.exe" -File | Select-Object -First 1
+          if (-not $installer) { throw "Installer for $tag was not built." }
+          $notes = "docs/releases/$tag.md"
+          if (-not (Test-Path $notes)) { throw "Release notes are missing: $notes" }
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release edit $tag --title "Later $tag" --notes-file $notes
+            if ($LASTEXITCODE -ne 0) { throw "Could not update release notes for $tag." }
+            gh release upload $tag $installer.FullName --clobber
+          } else {
+            gh release create $tag $installer.FullName --title "Later $tag" --notes-file $notes
+          }
