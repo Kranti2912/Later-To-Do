@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.15
+
+- Let the peek button move freely while dragging, then dock it to the nearest screen edge when released.
+- Preserve the selected edge and along-edge position across restarts.
+
 Notable user-facing changes are listed here. Git tags identify complete source snapshots; release notes for a version do not imply that a separate historical source snapshot is available.
 
 ## 1.0.14

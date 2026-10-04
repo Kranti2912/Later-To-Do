@@ -328,31 +328,52 @@ ipcMain.on('theme', (_, theme) => {
 ipcMain.on('move-peek', (_, payload) => {
   if (!win || win.isDestroyed() || state.mode !== 'peek' || !payload) return;
   try {
-    const area = screen.getDisplayMatching(win.getBounds()).workArea;
-    const edge = state.edge;
-    if (edge === 'left' || edge === 'right') {
-      const requestedY = Number(payload.y);
-      if (!Number.isFinite(requestedY)) return;
-      const peekSize = peekWindowSizeFor(edge);
-      const x = Math.round(edge === 'left' ? area.x : area.x + area.width - peekSize.width);
-      const y = Math.round(clamp(requestedY, area.y, area.y + area.height - peekSize.height));
-      win.setPosition(x, y, false);
-      state.offset = y - area.y;
-    } else {
-      const requestedX = Number(payload.x);
-      if (!Number.isFinite(requestedX)) return;
-      const peekSize = peekWindowSizeFor(edge);
-      const x = Math.round(clamp(requestedX, area.x, area.x + area.width - peekSize.width));
-      const y = Math.round(edge === 'top' ? area.y : area.y + area.height - peekSize.height);
-      win.setPosition(x, y, false);
-      state.offset = x - area.x;
-    }
+    const requestedX = Number(payload.x);
+    const requestedY = Number(payload.y);
+    if (!Number.isFinite(requestedX) || !Number.isFinite(requestedY)) return;
+
+    // Let the tab travel freely while it is being dragged. Snap it to the
+    // nearest edge on pointer release so it can move between all four sides.
+    const bounds = win.getBounds();
+    const x = Math.round(requestedX);
+    const y = Math.round(requestedY);
+    const center = { x: x + bounds.width / 2, y: y + bounds.height / 2 };
+    const area = screen.getDisplayNearestPoint(center).workArea;
+    const maxX = Math.max(area.x, area.x + area.width - bounds.width);
+    const maxY = Math.max(area.y, area.y + area.height - bounds.height);
+    win.setPosition(
+      Math.round(clamp(x, area.x, maxX)),
+      Math.round(clamp(y, area.y, maxY)),
+      false
+    );
   } catch (error) {
     console.error('Later could not move the peek tab:', error);
   }
 });
 
-ipcMain.on('finish-peek-move', () => saveState());
+ipcMain.on('finish-peek-move', () => {
+  if (!win || win.isDestroyed() || state.mode !== 'peek') return;
+  try {
+    const bounds = win.getBounds();
+    const area = screen.getDisplayMatching(bounds).workArea;
+    const distances = {
+      left: Math.abs(bounds.x - area.x),
+      right: Math.abs(area.x + area.width - bounds.x - bounds.width),
+      top: Math.abs(bounds.y - area.y),
+      bottom: Math.abs(area.y + area.height - bounds.y - bounds.height)
+    };
+    const edge = Object.keys(distances).reduce((nearest, candidate) =>
+      distances[candidate] < distances[nearest] ? candidate : nearest
+    );
+    const offset = edge === 'left' || edge === 'right'
+      ? bounds.y - area.y
+      : bounds.x - area.x;
+    setMode('peek', edge, Math.max(0, offset));
+  } catch (error) {
+    console.error('Later could not dock the peek tab:', error);
+    saveState();
+  }
+});
 
 ipcMain.on('content-height', (_, value) => {
   if (!win || win.isDestroyed() || !Number.isFinite(Number(value))) return;

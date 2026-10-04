@@ -1,6 +1,6 @@
 {
   "name": "later-floating-todo",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Later™ — a floating to-do list that lives at the edge of your screen.",
   "main": "src/main.js",
   "author": "Later™",
