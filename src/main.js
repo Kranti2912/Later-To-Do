@@ -197,10 +197,16 @@ function showWindow() {
   win.focus();
 }
 
+function restoreWindowWithoutFocus() {
+  if (isQuitting || !win || win.isDestroyed()) return;
+  if (win.isMinimized()) win.restore();
+  if (!win.isVisible()) win.showInactive();
+}
+
 function reanchorVisibleWindow() {
   if (!windowReady || !win || win.isDestroyed()) return;
   setMode(state.mode, state.edge, state.offset);
-  showWindow();
+  restoreWindowWithoutFocus();
 }
 
 function createWindow() {
@@ -253,11 +259,13 @@ function createWindow() {
   win.on('minimize', (event) => {
     if (isQuitting) return;
     event.preventDefault();
-    showWindow();
+    setImmediate(restoreWindowWithoutFocus);
   });
 
   win.on('hide', () => {
-    if (!isQuitting) setImmediate(showWindow);
+    // Windows can briefly hide topmost windows while opening the screenshot
+    // overlay. Restore Later without activating it so the capture UI stays open.
+    if (!isQuitting) setImmediate(restoreWindowWithoutFocus);
   });
 
   win.on('closed', () => { windowReady = false; win = null; });

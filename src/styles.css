@@ -44,11 +44,16 @@ button { border: 0; background: transparent; cursor: pointer; }
   border-radius: 18px;
   box-shadow: 0 5px 16px rgba(0,0,0,.36), 0 1px 4px rgba(0,0,0,.26);
   font-size: 18px; line-height: 1;
+  transition: filter .14s ease, box-shadow .14s ease;
   -webkit-backdrop-filter: blur(14px) saturate(135%);
   backdrop-filter: blur(14px) saturate(135%);
   -webkit-app-region: no-drag;
 }
-.peek-btn:hover { background: var(--hover); }
+.peek-btn:hover {
+  background: var(--glass-bg);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 19px rgba(0,0,0,.42), 0 1px 5px rgba(0,0,0,.3);
+}
 :root[data-edge="right"] .peek-btn { border-radius: 18px 0 0 18px; }
 :root[data-edge="left"] .peek-btn { border-radius: 0 18px 18px 0; }
 :root[data-edge="top"] .peek-btn { border-radius: 0 0 18px 18px; }
