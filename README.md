@@ -54,7 +54,3 @@ installer.nsh           Installer upgrade behavior
 ```
 
 See [CHANGELOG.md](CHANGELOG.md) for the version summary and [docs/releases](docs/releases/) for individual release descriptions. Available source snapshots are identified by Git tags, including `v1.0.3` and `v1.0.15`–`v1.0.17`. The historical `v1.0.5`–`v1.0.13` sources were recovered from their matching installers; original feature notes were not available for every archived version.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
