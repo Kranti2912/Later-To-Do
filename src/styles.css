@@ -80,3 +80,6 @@ button { border: 0; background: transparent; cursor: pointer; }
 .task:hover .delete { opacity: 1; }
 .delete:hover { background: var(--hover); color: var(--fg); }
 .empty { color: var(--muted); padding: 24px 10px; text-align: center; }
+.panel-footer { min-height: 42px; display: flex; align-items: center; justify-content: flex-end; padding: 6px 12px; border-top: 1px solid var(--line); }
+.quit-btn { min-width: 52px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 7px; color: var(--muted); font-size: 12px; line-height: 18px; }
+.quit-btn:hover { background: var(--hover); color: var(--fg); }

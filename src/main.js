@@ -7,7 +7,7 @@ const PEEK_H = 34;
 const EXPANDED_W = 560;
 const MIN_EXPANDED_W = 300;
 const MIN_EXPANDED_H = 180;
-const INITIAL_EXPANDED_H = 224;
+const INITIAL_EXPANDED_H = 256;
 const STATE_FILE = path.join(app.getPath('userData'), 'later-state.json');
 
 let win = null;
@@ -249,7 +249,16 @@ app.whenReady().then(() => {
 
 ipcMain.on('peek', () => setMode('peek'));
 ipcMain.on('expand', () => setMode('expanded'));
-ipcMain.on('quit', () => { isQuitting = true; saveState(); app.quit(); });
+ipcMain.on('quit', () => {
+  isQuitting = true;
+  saveState();
+  globalShortcut.unregisterAll();
+  if (tray) {
+    tray.destroy();
+    tray = null;
+  }
+  app.quit();
+});
 ipcMain.on('theme', (_, theme) => {
   if (theme !== 'dark' && theme !== 'light') return;
   state.theme = theme;
@@ -257,30 +266,26 @@ ipcMain.on('theme', (_, theme) => {
 });
 ipcMain.on('move-peek', (_, payload) => {
   if (!win || win.isDestroyed() || state.mode !== 'peek' || !payload) return;
-  const area = screen.getDisplayMatching(win.getBounds()).workArea;
-  const edge = state.edge;
-  if (edge === 'left' || edge === 'right') {
-    const requestedY = Number(payload.y);
-    if (!Number.isFinite(requestedY)) return;
-    const y = Math.round(clamp(requestedY, area.y, area.y + area.height - PEEK_H));
-    try {
-      win.setPosition(edge === 'left' ? area.x : area.x + area.width - PEEK_W, y, false);
-    } catch (error) {
-      console.error('Later could not move the peek tab:', error);
-      return;
+  try {
+    const area = screen.getDisplayMatching(win.getBounds()).workArea;
+    const edge = state.edge;
+    if (edge === 'left' || edge === 'right') {
+      const requestedY = Number(payload.y);
+      if (!Number.isFinite(requestedY)) return;
+      const x = Math.round(edge === 'left' ? area.x : area.x + area.width - PEEK_W);
+      const y = Math.round(clamp(requestedY, area.y, area.y + area.height - PEEK_H));
+      win.setPosition(x, y, false);
+      state.offset = y - area.y;
+    } else {
+      const requestedX = Number(payload.x);
+      if (!Number.isFinite(requestedX)) return;
+      const x = Math.round(clamp(requestedX, area.x, area.x + area.width - PEEK_W));
+      const y = Math.round(edge === 'top' ? area.y : area.y + area.height - PEEK_H);
+      win.setPosition(x, y, false);
+      state.offset = x - area.x;
     }
-    state.offset = y - area.y;
-  } else {
-    const requestedX = Number(payload.x);
-    if (!Number.isFinite(requestedX)) return;
-    const x = Math.round(clamp(requestedX, area.x, area.x + area.width - PEEK_W));
-    try {
-      win.setPosition(x, edge === 'top' ? area.y : area.y + area.height - PEEK_H, false);
-    } catch (error) {
-      console.error('Later could not move the peek tab:', error);
-      return;
-    }
-    state.offset = x - area.x;
+  } catch (error) {
+    console.error('Later could not move the peek tab:', error);
   }
 });
 

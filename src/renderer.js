@@ -33,7 +33,7 @@ function requestContentResize() {
     const taskPadding = parseFloat(tasksStyle.paddingTop) + parseFloat(tasksStyle.paddingBottom);
     const taskContentHeight = Array.from(tasksEl.children)
       .reduce((total, child) => total + child.getBoundingClientRect().height, 0);
-    const chromeHeight = $('topbar').offsetHeight + $('composer').offsetHeight;
+    const chromeHeight = $('topbar').offsetHeight + $('composer').offsetHeight + $('panelFooter').offsetHeight;
     const panelBorders = 2;
     window.laterAPI.setContentHeight(Math.ceil(chromeHeight + taskPadding + taskContentHeight + panelBorders));
   });
@@ -129,6 +129,10 @@ function endPeekPointer(e) {
 $('peekBtn').addEventListener('pointerup', endPeekPointer);
 $('peekBtn').addEventListener('pointercancel', endPeekPointer);
 $('minusBtn').addEventListener('click', () => window.laterAPI.peek());
+$('quitBtn').addEventListener('click', () => {
+  saveTasks();
+  window.laterAPI.quit();
+});
 $('addBtn').addEventListener('click', addTask);
 $('themeBtn').addEventListener('click', () => {
   theme = theme === 'dark' ? 'light' : 'dark';
