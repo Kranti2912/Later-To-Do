@@ -1,6 +1,6 @@
-# Later 1.0.8
+# Later 1.0.9
 
-This tag preserves the application source shipped in Later 1.0.8. The app files in src/ were recovered from that version's original installer; see ARCHIVE-NOTES.md for provenance and build details.
+This tag preserves the application source shipped in Later 1.0.9. The app files in src/ were recovered from that version's original installer; see ARCHIVE-NOTES.md for provenance and build details.
 
 ## Build
 
@@ -10,7 +10,7 @@ Requirements: Node.js 22 and npm.
     npm start
     npm run dist
 
-Pushing this version tag runs the Windows release workflow and creates an installer on the v1.0.8 GitHub Release: https://github.com/Kranti2912/Later-To-Do/releases/tag/v1.0.8
+Pushing this version tag runs the Windows release workflow and creates an installer on the v1.0.9 GitHub Release: https://github.com/Kranti2912/Later-To-Do/releases/tag/v1.0.9
 
 ## Data
 

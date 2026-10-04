@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const PEEK_W = 44;
 const PEEK_H = 34;
+const PEEK_SHADOW_PAD = 18;
 const EXPANDED_W = 560;
 const MIN_EXPANDED_W = 300;
 const MIN_EXPANDED_H = 180;
@@ -80,6 +81,13 @@ function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
 }
 
+function peekWindowSizeFor(edge) {
+  if (edge === 'left' || edge === 'right') {
+    return { width: PEEK_W + PEEK_SHADOW_PAD, height: PEEK_H + PEEK_SHADOW_PAD * 2 };
+  }
+  return { width: PEEK_W + PEEK_SHADOW_PAD * 2, height: PEEK_H + PEEK_SHADOW_PAD };
+}
+
 function expandedSizeFor(area) {
   const maxWidth = Math.max(MIN_EXPANDED_W, area.width - 24);
   const maxHeight = Math.max(MIN_EXPANDED_H, area.height - 24);
@@ -92,8 +100,9 @@ function expandedSizeFor(area) {
 function boundsFor(edge, offset, mode) {
   const area = workArea();
   const expandedSize = expandedSizeFor(area);
-  const w = mode === 'peek' ? PEEK_W : expandedSize.width;
-  const h = mode === 'peek' ? PEEK_H : expandedSize.height;
+  const peekSize = peekWindowSizeFor(edge);
+  const w = mode === 'peek' ? peekSize.width : expandedSize.width;
+  const h = mode === 'peek' ? peekSize.height : expandedSize.height;
   let x = area.x + Math.round((area.width - w) / 2);
   let y = area.y + Math.round((area.height - h) / 2);
 
@@ -192,13 +201,15 @@ function reanchorVisibleWindow() {
 }
 
 function createWindow() {
+  const initialPeekSize = peekWindowSizeFor(state.edge);
   win = new BrowserWindow({
-    width: PEEK_W,
-    height: PEEK_H,
+    width: initialPeekSize.width,
+    height: initialPeekSize.height,
     minWidth: 1,
     minHeight: 1,
     frame: false,
     transparent: true,
+    hasShadow: false,
     resizable: false,
     movable: true,
     alwaysOnTop: true,
@@ -295,15 +306,17 @@ ipcMain.on('move-peek', (_, payload) => {
     if (edge === 'left' || edge === 'right') {
       const requestedY = Number(payload.y);
       if (!Number.isFinite(requestedY)) return;
-      const x = Math.round(edge === 'left' ? area.x : area.x + area.width - PEEK_W);
-      const y = Math.round(clamp(requestedY, area.y, area.y + area.height - PEEK_H));
+      const peekSize = peekWindowSizeFor(edge);
+      const x = Math.round(edge === 'left' ? area.x : area.x + area.width - peekSize.width);
+      const y = Math.round(clamp(requestedY, area.y, area.y + area.height - peekSize.height));
       win.setPosition(x, y, false);
       state.offset = y - area.y;
     } else {
       const requestedX = Number(payload.x);
       if (!Number.isFinite(requestedX)) return;
-      const x = Math.round(clamp(requestedX, area.x, area.x + area.width - PEEK_W));
-      const y = Math.round(edge === 'top' ? area.y : area.y + area.height - PEEK_H);
+      const peekSize = peekWindowSizeFor(edge);
+      const x = Math.round(clamp(requestedX, area.x, area.x + area.width - peekSize.width));
+      const y = Math.round(edge === 'top' ? area.y : area.y + area.height - peekSize.height);
       win.setPosition(x, y, false);
       state.offset = x - area.x;
     }

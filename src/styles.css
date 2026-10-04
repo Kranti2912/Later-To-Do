@@ -30,12 +30,17 @@ button { border: 0; background: transparent; cursor: pointer; }
 .panel.active { display: flex; }
 
 .peek { align-items: center; justify-content: center; }
+.peek { -webkit-app-region: no-drag; }
+:root[data-edge="right"] .peek { justify-content: flex-end; }
+:root[data-edge="left"] .peek { justify-content: flex-start; }
+:root[data-edge="top"] .peek { align-items: flex-start; }
+:root[data-edge="bottom"] .peek { align-items: flex-end; }
 .peek-btn {
   width: 44px; height: 34px; padding: 0;
   background: var(--bg); color: var(--fg);
   border: 1px solid var(--line);
   border-radius: 18px;
-  box-shadow: 0 8px 24px rgba(0,0,0,.18);
+  box-shadow: 0 5px 16px rgba(0,0,0,.36), 0 1px 4px rgba(0,0,0,.26);
   font-size: 18px; line-height: 1;
   -webkit-app-region: no-drag;
 }
