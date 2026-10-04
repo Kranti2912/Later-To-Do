@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Later™</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app">
+    <section id="peek" class="peek" aria-label="Open Later">
+      <button id="peekBtn" class="peek-btn" title="Open Later™">👀</button>
+    </section>
+
+    <section id="panel" class="panel">
+      <header class="topbar">
+        <div class="title">👀 Later™</div>
+        <div class="actions">
+          <button id="themeBtn" class="icon-btn" title="Toggle theme">◐</button>
+          <button id="minusBtn" class="icon-btn" title="Peek">−</button>
+        </div>
+      </header>
+
+      <div class="composer">
+        <input id="taskInput" autocomplete="off" placeholder="Add a task" aria-label="Add a task" />
+        <button id="addBtn" class="add-btn">+</button>
+      </div>
+
+      <div id="tasks" class="tasks"></div>
+
+    </section>
+  </main>
+  <script src="renderer.js"></script>
+</body>
+</html>

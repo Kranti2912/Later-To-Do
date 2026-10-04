@@ -1,0 +1,52 @@
+# Dependencies and generated build output
+node_modules/
+dist/
+out/
+coverage/
+release-builds/
+
+# Download/build caches
+.electron-cache/
+.electron-builder-cache/
+.npm-cache/
+.cache/
+**/.electron-cache/
+**/.electron-builder-cache/
+**/.npm-cache/
+**/.cache/
+
+# Local app data, task exports, logs, and debug files
+user-data/
+local-data/
+later-state.json
+tasks.json
+tasks-export*.json
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Installer binaries and archives belong in GitHub Releases, not source history
+*.exe
+*.msi
+*.asar
+*.blockmap
+*.zip
+*.dmg
+*.AppImage
+
+# OS/editor metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/

@@ -1,0 +1,42 @@
+{
+  "name": "later-floating-todo",
+  "version": "1.0.3",
+  "description": "Later™ — a floating to-do list that lives at the edge of your screen.",
+  "main": "src/main.js",
+  "author": "Later™",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win nsis"
+  },
+  "devDependencies": {
+    "electron": "44.2.0",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "in.moto365.later",
+    "productName": "Later",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "src/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "artifactName": "Later-Setup-${version}.${ext}",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": false,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Later"
+    }
+  }
+}
