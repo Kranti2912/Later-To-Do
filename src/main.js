@@ -13,6 +13,7 @@ const STATE_FILE = path.join(app.getPath('userData'), 'later-state.json');
 let win = null;
 let tray = null;
 let isQuitting = false;
+let windowReady = false;
 let automaticExpandedHeight = INITIAL_EXPANDED_H;
 let expectedProgrammaticSize = null;
 let resizeSaveTimer = null;
@@ -32,9 +33,7 @@ if (!hasSingleInstanceLock) {
   app.quit();
 } else {
   app.on('second-instance', () => {
-    if (!win || win.isDestroyed()) return;
-    if (!win.isVisible()) win.show();
-    win.focus();
+    showWindow();
   });
 }
 
@@ -169,19 +168,26 @@ function createTray() {
   tray = new Tray(icon.resize({ width: 16, height: 16 }));
   tray.setToolTip('Later™');
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: 'Show / Hide Later™', click: toggleWindow },
+    { label: 'Show Later™', click: showWindow },
     { label: 'Peek', click: () => setMode('peek') },
     { label: 'Expand', click: () => setMode('expanded') },
     { type: 'separator' },
     { label: 'Quit Later™', click: () => { isQuitting = true; app.quit(); } }
   ]));
-  tray.on('click', toggleWindow);
+  tray.on('click', showWindow);
 }
 
-function toggleWindow() {
+function showWindow() {
   if (!win || win.isDestroyed()) return;
-  if (win.isVisible()) win.hide();
-  else { win.show(); win.focus(); }
+  if (win.isMinimized()) win.restore();
+  if (!win.isVisible()) win.show();
+  win.focus();
+}
+
+function reanchorVisibleWindow() {
+  if (!windowReady || !win || win.isDestroyed()) return;
+  setMode(state.mode, state.edge, state.offset);
+  showWindow();
 }
 
 function createWindow() {
@@ -214,6 +220,7 @@ function createWindow() {
   });
 
   win.once('ready-to-show', () => {
+    windowReady = true;
     setMode(state.mode, state.edge, state.offset, false);
     win.webContents.send('initial-state', state);
     win.show();
@@ -224,11 +231,21 @@ function createWindow() {
   win.on('close', (event) => {
     if (!isQuitting) {
       event.preventDefault();
-      win.hide();
+      showWindow();
     }
   });
 
-  win.on('closed', () => { win = null; });
+  win.on('minimize', (event) => {
+    if (isQuitting) return;
+    event.preventDefault();
+    showWindow();
+  });
+
+  win.on('hide', () => {
+    if (!isQuitting) setImmediate(showWindow);
+  });
+
+  win.on('closed', () => { windowReady = false; win = null; });
 }
 
 app.whenReady().then(() => {
@@ -241,7 +258,7 @@ app.whenReady().then(() => {
   }
   createWindow();
   createTray();
-  globalShortcut.register('CommandOrControl+Shift+Space', toggleWindow);
+  globalShortcut.register('CommandOrControl+Shift+Space', showWindow);
 }).catch((error) => {
   console.error('Later failed to start:', error);
   dialog.showErrorBox('Later failed to start', error.message || String(error));
@@ -308,6 +325,11 @@ ipcMain.on('set-edge-offset', (_, payload) => {
 });
 
 app.on('before-quit', () => { isQuitting = true; saveState(); });
+app.on('session-end', () => { isQuitting = true; saveState(); });
 app.on('will-quit', () => globalShortcut.unregisterAll());
 app.on('window-all-closed', (event) => event.preventDefault());
-app.on('activate', () => { if (win) win.show(); });
+app.on('activate', showWindow);
+
+screen.on('display-added', reanchorVisibleWindow);
+screen.on('display-removed', reanchorVisibleWindow);
+screen.on('display-metrics-changed', reanchorVisibleWindow);
