@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.17
+
+- Removed the whole-window Windows Acrylic material from peek mode so it no longer paints a rectangular backdrop outside the rounded button.
+- Kept the translucent pill and shadow; Acrylic remains on the expanded panel.
+
 ## 1.0.16
 
 - Bundled Montserrat for task text so the list uses the same typeface on every supported PC.

@@ -39,7 +39,7 @@ button { border: 0; background: transparent; cursor: pointer; }
 .panel.active { display: flex; }
 
 .peek { align-items: center; justify-content: center; }
-.peek { -webkit-app-region: no-drag; }
+.peek { -webkit-app-region: no-drag; pointer-events: none; }
 :root[data-edge="right"] .peek { justify-content: flex-end; }
 :root[data-edge="left"] .peek { justify-content: flex-start; }
 :root[data-edge="top"] .peek { align-items: flex-start; }
@@ -50,10 +50,11 @@ button { border: 0; background: transparent; cursor: pointer; }
   border: 1px solid var(--line);
   border-radius: 18px;
   box-shadow: 0 5px 16px rgba(0,0,0,.36), 0 1px 4px rgba(0,0,0,.26);
-  font-size: 18px; line-height: 1;
-  transition: filter .14s ease, box-shadow .14s ease;
   -webkit-backdrop-filter: blur(14px) saturate(135%);
   backdrop-filter: blur(14px) saturate(135%);
+  font-size: 18px; line-height: 1;
+  transition: filter .14s ease, box-shadow .14s ease;
+  pointer-events: auto;
   -webkit-app-region: no-drag;
 }
 .peek-btn:hover {

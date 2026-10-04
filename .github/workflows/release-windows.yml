@@ -43,4 +43,11 @@ jobs:
         shell: pwsh
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "$env:GITHUB_REF_NAME" dist\Later-Setup-*.exe --title "Later $env:GITHUB_REF_NAME" --generate-notes
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          $notes = "docs/releases/$tag.md"
+          if (Test-Path $notes) {
+            gh release create $tag dist\Later-Setup-*.exe --title "Later $tag" --notes-file $notes
+          } else {
+            gh release create $tag dist\Later-Setup-*.exe --title "Later $tag" --generate-notes
+          }

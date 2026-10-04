@@ -41,7 +41,7 @@ npm start
 npm run dist
 ```
 
-The Windows installer is written to `dist/`. Pushing a version tag builds an installer and attaches it to a GitHub Release.
+The Windows installer is written to `dist/`. Pushing a version tag builds an installer and attaches it to a GitHub Release with the matching notes from `docs/releases/`.
 
 ## Project layout
 
@@ -49,10 +49,11 @@ The Windows installer is written to `dist/`. Pushing a version tag builds an ins
 src/                    Electron main process and UI
 src/assets/             App assets
 .github/workflows/      Windows build and release automation
+docs/releases/          Version-specific release descriptions
 installer.nsh           Installer upgrade behavior
 ```
 
-See [CHANGELOG.md](CHANGELOG.md) for release notes. Available source snapshots are identified by Git tags, including `v1.0.3` and `v1.0.14`.
+See [CHANGELOG.md](CHANGELOG.md) for the version summary and [docs/releases](docs/releases/) for individual release descriptions. Available source snapshots are identified by Git tags, including `v1.0.3` and `v1.0.15`–`v1.0.17`. The historical `v1.0.5`–`v1.0.13` sources were recovered from their matching installers; original feature notes were not available for every archived version.
 
 ## License
 
