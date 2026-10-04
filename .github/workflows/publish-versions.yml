@@ -60,7 +60,7 @@ jobs:
         working-directory: source
 
       - name: Build Windows installer
-        run: npm run dist
+        run: npm run dist -- --publish never
         working-directory: source
 
       - name: Create or update GitHub Release
